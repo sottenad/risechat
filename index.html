@@ -1,0 +1,192 @@
+﻿<!doctype html>
+<html>
+<head>
+    <title>RiseChat 1.0</title>
+    
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
+
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/mike.css" />
+    <link rel="stylesheet" href="/css/overrides.css" />
+
+    <meta name="viewport" content="width=device-width">
+
+    <script src="//cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.js"></script>
+
+</head>
+<body>
+
+
+    <div class="container-fluid app">
+        <!-- Side Column -->
+        <div class="col-sm-3 hidden-xs app-col sidebar">
+            <div class="msgbox">
+                <div class="details">
+                    <span id="user_count"></span> active users
+                </div>
+                <h4><img src="/img/logo.png" /></h4>
+            </div>
+            <div class="channels">
+                <h5>Channels</h5>
+                <ul>
+                    <li><a class="change-room" data-room-id="general">#general</a></li>
+                    <li><a class="change-room" data-room-id="hackathon">#hackathon</a></li>
+                </ul>
+                <a href="#" id="addChannelBtn"><i class="fa fa-plus"></i></a>
+            </div>
+            <div class="directory">
+                <h5>Directory <span id="directoryCount"></span></h5>
+                <div id="directory"></div>
+            </div>
+            <div class="utils">
+                <!--<a id="userMenu">
+                    <img src="" id="userProfileImage" />
+                </a>-->
+                <a href="#" id="editUser">
+                    <i class="fa fa-cog"></i>
+                </a>
+                <div class="pull-right userCount">
+                    <i class="fa fa-user"></i>
+                    <span id="userCount"></span>
+                </div>
+                
+            </div>
+            
+        </div>
+        <!-- Main column -->
+        <div class="col-sm-9 col-xs-12 app-col">
+            <div id="search" class="container-fluid">
+                <div class="col-xs-10 col-sm">
+                    <h4 id="channelName">#general</h4>
+                    <input type="text" id="searchTerm" placeholder="Start Searching" />
+                </div>
+                <div class="col-xs-2">
+                    <a id="searchBtn" class="pull-right"><i class="fa fa-search"></i></a>
+                    <a id="searchCloseBtn" class="pull-right"><i class="fa fa-times"></i></a>
+                </div>
+                <div id="searchResults" class="col-xs-12"></div>
+            </div>
+
+            <div id="messages">
+                <!-- Messages go here -->
+            </div>
+
+            <div class="sticky">
+                <form class="message">
+                    <div class="row">
+                        <input id="m" autocomplete="off" class="form-control" placeholder="Type You Message Here" />
+                        <!--<button class="btn btn-primary">Send</button>-->
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+        
+    <!-- Username modal -->
+    <div class="modal fade" id="username_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="exampleModalLabel">User Details</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="username">Your Name</label>
+                            <input type="text" class="form-control" id="username" placeholder="Your Name" />
+                        </div>
+                    </form>
+                </div> 
+                <div class="modal-footer">
+                    <a id="setUsername" class="btn btn-primary">Save</a>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+
+    <!-- Username modal -->
+    <div class="modal fade" id="channel_modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="exampleModalLabel">Add A Channel</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="channelName">Channel Name</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">#</div>
+                                <input type="text" class="form-control" id="channelNameInput" placeholder="ChannelName" />
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <a id="createChannel" class="btn btn-primary">Create Channel</a>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <!-- Handlebars templates -->
+    <script id="messageTemplate" type="text/x-handlebars-template">
+        {{#each . }}
+        <div>
+            <div class="pull-left avatar">
+                {{#if AvatarURL}}
+                    <img src="{{AvatarURL}}" />
+                {{else}}
+                    <img src="/img/default_face.jpg" />
+                {{/if}}
+            </div>
+            
+            <div class="pull-left msg-details">
+                <span class="user-stamp">
+                    <strong>{{MessageFrom}}</strong>
+                    <small>{{Posted}}</small>
+                </span>
+                {{{MessageText}}}
+            </div>
+        </div>
+        {{/each}}
+    </script>
+
+    <script id="searchTemplate" type="text/x-handlebars-template">
+        {{#each .}}
+        <div>
+            <div class="msg-details">
+                <span>
+                    <strong>{{MessageFrom}}: </strong>
+                </span>
+                <small class="pull-right">{{Posted}}</small>
+                {{{MessageText}}}
+            </div>
+        </div>
+        {{/each}}
+    </script>
+
+    <script id="directoryTemplate" type="text/x-handlebars-template">
+        {{#each .}}
+        <div class="directoryItem">
+            <div class="pull-left avatar">
+                <img src="{{AvatarURL}}" />
+            </div>
+            <span>{{UserName}}</span>
+        </div>
+        {{/each}}
+    </script>
+
+    <!-- Scripts -->
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.0/handlebars.min.js"></script>
+    <script src="/js/utils.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="/js/minEmoji.js"></script>
+</body>
+</html>

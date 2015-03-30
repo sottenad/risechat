@@ -1,0 +1,354 @@
+﻿body, html, .app{
+    width:100%;
+    height:100%;
+    font-family: 'Lato', sans-serif;
+}
+
+
+.change-room{
+    cursor:pointer;
+}
+.disabled,.disabled:link,.disabled:hover,.disabled:active,.disabled:visited{
+    background-color:#40bbc8;
+    text-decoration:none;
+    cursor:auto;
+}
+
+.channels, .directory{
+    border-bottom: 1px solid #1A505B;
+}
+
+.channels ul
+{
+    list-style:none;
+    margin:0 0 25px 0;
+    padding:0;
+}
+.channels li{
+    margin:5px 0;
+}
+.channels a{
+    padding: 0 25px;
+}
+.channels h5, .directory h5{
+    padding:25px 25px 0 25px;
+}
+.channels a:hover{
+    color:#fff;
+    text-decoration:none;
+}
+#addChannelBtn{
+    position:absolute;
+    top:80px;
+    right:-10px;
+    color:#3cbdc4;
+    font-size:12px;
+    -webkit-transition: color .2s;
+    transition: color .2s;
+}
+#addChannelBtn:hover{
+    color:#fff;
+}
+
+.directory{
+    font-weight:300;
+    max-height:100%;
+}
+.directory .directoryItem{
+    margin:5px 0;
+    padding:3px 25px;
+    min-height:45px;
+}
+.directory div div:hover{
+    background:#0c4855;
+
+}
+.directory span{
+    display:inline-block;
+    margin:10px 0 0 10px;
+    font-size:16px;
+    max-width:75%;
+}
+
+.sidebar{
+    height:100%;
+    padding-bottom:55px;
+    background: #003B48;
+}
+.sidebar h4
+{
+    color: white;
+    font-size: 30px;
+    letter-spacing: 2px;
+    margin:0;
+    padding:6px 0 16px 25px;
+    border-bottom:1px solid #1f505b;
+}
+.sidebar h5{
+    color:#fce14d;
+    text-transform:uppercase;
+    margin:0 0 12px 0;
+    text-shadow: 0 1px 1px #333;
+    letter-spacing:2px;
+    font-size:12px;
+    font-weight:400;
+}
+
+
+.details{
+    color: white;
+    background-color: #003B48;
+    border-bottom: 1px solid #1A505B;
+    /*Hide this for now*/
+    display: none;
+}
+.details h4, .details div{
+    margin:0;
+    padding:10px;
+    display:inline-block;
+}
+
+.sticky{
+    position:fixed;
+    bottom:0;
+    left:25%;
+    right:0;
+}
+.sticky input{
+    border-radius:0;
+}
+
+.utils{
+    position:absolute;
+    bottom:0;
+    left:0;
+    right:0;
+    background:#0a4451;
+    min-height:55px;
+    padding:0 10px;
+}
+#userMenu img, .directory img{
+    height:38px;
+    width:38px;
+    border-radius:19px;
+}
+
+
+
+#editUser{
+    display:inline-block;
+    margin:10px;
+    font-size:20px;
+    color:#ccc;
+    -webkit-transition: color .2s;
+    transition: color .2s;
+}
+#editUser:hover{
+    color:#fff;
+}
+
+.avatar img{
+    border-radius:24px;
+}
+
+.userCount{
+    color:#3cbdc4;
+    margin:15px 10px 0 0;
+    font-size:18px;
+}
+
+#userCount{
+    color:#3cbdc4;
+    margin-left:5px;
+}
+
+.app-col{
+    height:100%;
+    overflow:hidden;
+}
+
+.message {
+    background: #eee;
+    padding: 10px;   
+    border-top:1px solid #ddd;
+}
+#messages{
+    
+    position:absolute;
+    top:55px;
+    bottom:55px;
+    width:100%;
+    overflow-y:scroll;
+
+}
+#messages div {
+    padding: 5px 10px;
+    min-height:48px;
+    overflow:hidden;
+    font-size:16px;
+    color:#666;
+}
+
+#messages .user-stamp{
+    display:block;
+    margin-top:2px;
+}
+#messages .msg-details span{
+
+}
+#messages small{
+    font-size:13px;
+    color:#bbb;
+    display:inline-block;
+    padding-left:5px;
+}
+#messages strong{
+    font-size:16px;
+    color:#063c48;
+    font-weight:700;
+}
+#messages > div:nth-child(even) {
+    /*background: #f3f3f3;*/
+}
+
+#messages .loading{
+    text-align:center;
+    margin-top:30px;
+    font-size:40px;
+}
+
+.flash{
+    position:fixed;
+    background:#fff;
+    box-shadow: 0 2px 2px rgba(0,0,0,0.3) ;
+    top:55px;
+    left:25%;
+    width:75%;
+}
+.flash em{
+    padding:10px 10px 10px 25px;
+
+}
+
+/*Directory*/
+#directory div{
+    clear:both;
+    color:#fff;
+}
+
+/*Search bar*/
+#search{
+    position:fixed;
+    top:0;
+    right:0;
+    left:25%;
+    z-index:10;
+    max-height:100%;
+    min-height: 55px;
+    background: #2fc4b5; /* Old browsers */
+    background: -moz-linear-gradient(left,  #2fc4b5 0%, #40bbc8 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, right top, color-stop(0%,#2fc4b5), color-stop(100%,#40bbc8)); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(left,  #2fc4b5 0%,#40bbc8 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(left,  #2fc4b5 0%,#40bbc8 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(left,  #2fc4b5 0%,#40bbc8 100%); /* IE10+ */
+    background: linear-gradient(to right,  #2fc4b5 0%,#40bbc8 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2fc4b5', endColorstr='#40bbc8',GradientType=1 ); /* IE6-9 */
+}
+#search input[type='text']{
+    background:transparent;
+    font-size:24px;
+    border:0 none;
+    color:white;
+    margin:8px 0 0 5px;
+    outline: 0;
+    width:100%;
+    display:none;
+    font-weight:100;
+}
+#search.active input{
+    display:block;
+}
+
+#search input[type='text']:focus {
+    border:0;
+}
+#searchBtn, #searchCloseBtn{
+    display:inline-block;
+    color:#f8fdfd;
+    font-size:22px;
+    padding:5px 8px;
+    margin:6px 0px 8px 0;
+    border-radius:10px;
+    -webkit-transition: background-color .2s;
+    transition:background-color .2s;
+}
+#searchBtn:hover, #searchCloseBtn:hover{
+    cursor:pointer;
+}
+#search.active #searchBtn{
+    display:none;
+}
+
+#searchCloseBtn{
+    display:none;
+}
+#search.active #searchCloseBtn{
+    display:block;
+}
+
+#search.active{
+    background-color:#1b6571;
+    background:#1b6571;
+}
+
+#search.active h4{
+    display:none;
+}
+#search h4{
+    font-size:24px;
+    color:#fff;
+    margin:12px 0 0 10px;
+}
+
+
+#searchResults{
+    background:#1b6571;
+    max-height:100%;
+    overflow-y:auto;
+    position:relative;
+    min-height:0;
+}
+#searchResults div{
+    min-height:35px;
+    color:#fff;
+    padding-right:5px;
+}
+
+
+::-webkit-input-placeholder {color:#82aab1;}
+:-moz-placeholder {color:#82aab1; opacity:  1;}
+::-moz-placeholder {color:#82aab1; opacity:  1;}
+:-ms-input-placeholder {color: #82aab1;}
+
+/*Bootstrap overrides*/
+.row, .container-fluid, .app-col{
+    margin:0; padding:0
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #40bbc8;
+    border-color: #309da9;
+}
+.btn-primary:hover, .btn-primary:active{
+    background-color: #309da9;
+    border-color: #36949e;
+}
+
+
+@media (max-width: 768px) {
+    .sticky, #search{
+        left:0;
+        width:100%;
+    }
+}
