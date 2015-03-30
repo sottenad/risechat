@@ -1,4 +1,4 @@
-﻿///var ngrok = require('ngrok');
+///var ngrok = require('ngrok');
 var express = require('express');
 var app = express();
 
@@ -16,8 +16,11 @@ app.get('/', function (req, res) {
     console.log('going to index');
 });
 
-http.listen(3000, function () {
-    console.log('listening on *:3000');
+
+var port = process.env.port || 3000;
+
+http.listen(port, function () {
+    console.log('listening on *:' + port );
 });
 
 /*
