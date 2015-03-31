@@ -6,6 +6,8 @@ var http = require('http').Server(app);
 var req = require('request');
 var io = require('socket.io')(http);
 var path = require('path');
+var mongoose = require('mongoose');
+var textSearch = require('mongoose-text-search');
 
 //Configure static asset routes
 app.use("/img", express.static(__dirname + "/img"));
@@ -23,7 +25,23 @@ http.listen(port, function () {
     console.log('listening on *:' + port );
 });
 
-/*
+//Connect to DB and specify collection.
+mongoose.connect('localhost', 'risechat');
+// create our schema 
+var chatSchema = mongoose.Schema({
+    messageText: String,
+    username: String,
+    posted: Date,
+    avatarUrl: String,
+    channel: String
+});
+
+chatSchema.plugin(textSearch);
+chatSchema.index({ messageText: 'text' });
+var ChatMessage = mongoose.model('ChatMessage', chatSchema);
+
+
+
 var rooms = ['general', 'hackathon'];
 
 //Connection to the socket.
@@ -35,28 +53,20 @@ io.sockets.on('connection', function (socket) {
     });
      
     socket.on('switchRoom', function (newroom) {
-        console.log('switchRoom: ' + newroom)
+        
         socket.leave(socket.room);
         socket.join(newroom);       
         socket.room = newroom;
 
-        var resp;
-        req.get({
-            'uri': 'http://bhpcourse.bluerooster.com/services/messages.asmx/GetMessages?max=30&cn='+newroom ,
-            'json':true,
-            'headers': {}
-        }, function (e, r, body) {
-            if (!e && r.statusCode == 200) {
-                //console.log(body);
-                resp = body;
-            } else {
-                console.log("Response error:" +  e + body);
-                resp = [];
+        console.log('switchRoom: ' + newroom)
+        ChatMessage.find({channel:newroom}, function(err, data){
+            if(err){
+                //console.log(err);
+            }else{
+                socket.emit('updateRoom', { 'room': newroom, 'messages': data });
             }
-            //Now pass back the room with the prepopulated messages (or none in an error)
-            socket.emit('updateRoom', { 'room': newroom, 'messages': resp });
         });
-
+        
         //Every time someone joins, we want to re-fire this.
         getUsers(socket);
     });
@@ -103,6 +113,8 @@ io.sockets.on('connection', function (socket) {
 
 
 function getUsers(socket) {
+    
+    /*
     req.get({
         'uri': 'http://bhpcourse.bluerooster.com/services/users.asmx/Getusers',
         'json': true,
@@ -115,16 +127,19 @@ function getUsers(socket) {
             console.log("Response error:" + e + body);
         }
         socket.emit('getUsers', resp);
-    });
+    }); 
+    */
 }
 
 function pushNew(msg, thisroom) {
-    req.post({
-        'uri': 'http://bhpcourse.bluerooster.com/services/messages.asmx/AddMessage?mt=' + msg.MessageText + '&mf=' + msg.MessageFrom + '&cn=' + thisroom + '&avatarurl=' + msg.AvatarUrl,
-        'dataType': 'json',
-        'headers': {}
-    }, function (e, r, body) {
-        console.log("Response error:" + e + body);
+    var chatMessage = new ChatMessage({
+        messageText: msg.messageText,
+        username: msg.username,
+        posted: new Date(),
+        avatarUrl: msg.avatarUrl,
+        channel: thisroom
+    });
+    chatMessage.save(function (err, msg) {
+        console.log(msg); 
     });
 }
-*/

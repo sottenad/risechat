@@ -1,4 +1,4 @@
-﻿var risechat = risechat || {}
+var risechat = risechat || {}
 
 
 /* =============================================== */
@@ -30,7 +30,6 @@ $(function () {
     });
 
     $('body').on('click', '.directoryItem', function (e) {
-        console.log('on');
         $('#search').addClass('active');
         var searchTerm = $(e.target).text().trim();
         $('#searchTerm').val(searchTerm)
@@ -49,9 +48,8 @@ $(function () {
         $('#channel_modal').modal({ show: true });
     });
     $('body').on('click', '#createChannel', function () {
-        console.log('on')
         var channelName = $('#channelNameInput').val().toLowerCase().trim();
-        console.log(channelName)
+
         socket.emit('addChannel', channelName);
         $('#channelNameInput').val('')
         $('#channel_modal').modal('hide');
@@ -78,10 +76,11 @@ $(function () {
         $('#userProfileImage').attr('src', risechat.avatarurl)
     }
 
+    //Edit user details
     $('#editUser').on('click', function (e) {
         $('#username_modal').modal('show');
     });
-
+    //Set user details
     $('body').on('click', '#setUsername', function (e) {
         var username = $('#username').val()
         if (username.length > 0) {
@@ -92,7 +91,7 @@ $(function () {
 
     //INitial room
     socket.emit('switchRoom', 'general');   
-
+    //Send change room
     $('body').on('click', '.change-room', function (e) {
         $('#messages').empty().html('<div class="loading"><i class="fa fa-refresh fa-spin"></i></div>');
         socket.emit('switchRoom', $(this).attr('data-room-id'));
@@ -120,16 +119,17 @@ $('form').submit(function () {
     messageTxt = messageTxt.replace("8-)", "\ud83d\ude0e");
     messageTxt = messageTxt.replace("8)", "\ud83d\ude0e");
 
-    if (messageTxt)
+    
     var smiley = "\ud83d\ude04";
     //messageTxt += smiley;
+    
     if (messageTxt.trim().length > 0) {
-        messageTxt = minEmoji(messageTxt );
+        //messageTxt = minEmoji(messageTxt );
         socket.emit('newMessage',
             {
-                'MessageText': replaceURLWithHTMLLinks(messageTxt),
-                'MessageFrom': window.localStorage.getItem("username"),
-                'AvatarUrl':  window.localStorage.getItem("avatarurl")
+                'messageText': replaceURLWithHTMLLinks(messageTxt),
+                'username': window.localStorage.getItem("username"),
+                'avatarUrl':  window.localStorage.getItem("avatarurl")
             }
         );
         messageBox.val('');
@@ -149,12 +149,11 @@ socket.on('userCount', function (user_count) {
 socket.on('newMessage', function (msg) {
     var now = new Date();
     var timestamp = moment(now).format('h:mm a');
-    console.log(msg);
     var context = [{
-        'Posted': timestamp,
-        'MessageText': msg.MessageText,
-        'MessageFrom': msg.MessageFrom,
-        'AvatarURL': msg.AvatarUrl
+        'posted': timestamp,
+        'messageText': msg.messageText,
+        'username': msg.username,
+        'avatarUrl': msg.avatarUrl
     }];
     var messageHtml = risechat.messageTemplate(context)
     var $msg = $('#messages');
@@ -175,7 +174,7 @@ socket.on('searchResults', function (results) {
 
 socket.on('getUsers', function (resp) {
     $(resp).each(function (i) {
-        if (this.AvatarURL.indexOf('http') == -1) {
+        if (this.avatarUrl.indexOf('http') == -1) {
             var ind = resp.indexOf(this)
             resp.splice(ind, 1);
         }
@@ -185,11 +184,10 @@ socket.on('getUsers', function (resp) {
 });
 
 socket.on('updateChannelList', function (rooms) {
-    console.log('updating channel: '+rooms)
+
     var list = $('.channels ul');
     $(rooms).each(function (i) {
         if ($("[data-room-id='" + rooms[i] + "']").length <= 0) {
-            console.log('adding')
             $(list).append("<li><a class='change-room' data-room-id='" + rooms[i] + "'>#" + rooms[i] + "</a></li>")
         }
     });
@@ -205,11 +203,10 @@ socket.on('updateRoom', function (resp) {
 
     //Loop through and format the dates
     $(resp.messages).each(function () {
-        this.Posted = moment(this.Posted).format('h:mm a');
+        this.posted = moment(this.posted).format('h:mm a');
     });
 
-    console.log(resp.messages);
-    var messageHtml = risechat.messageTemplate(resp.messages.reverse())
+    var messageHtml = risechat.messageTemplate(resp.messages) //Dont reverse here.
 
     var $msg = $('#messages');
     $msg.append(messageHtml);
