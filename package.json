@@ -4,6 +4,7 @@
   "description": "my socket.io app",
   "dependencies": {
     "express": "^4.10.2",
+    "moment": "^2.9.0",
     "mongodb": "^2.0.25",
     "mongoose": "^4.0.1",
     "mongoose-text-search": "0.0.2",

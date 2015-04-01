@@ -18,6 +18,7 @@ $(function () {
     //Change searchbox styling
     $('#searchBtn').on('click', function () {
         $('#search').addClass('active');
+        $('#searchTerm').focus();        
     });
     $('#searchCloseBtn').on('click', function () {
         $('#search').removeClass('active');
@@ -28,8 +29,9 @@ $(function () {
     $('#search').on('keyup', '#searchTerm', function (e) {
         var searchTerm = $(e.target).val();
         if(searchTerm.length > 2){
-            console.log('searching...', searchTerm);
             socket.emit('search', searchTerm);
+        }else{
+            showNoResults(true);
         }
     });
 
@@ -153,14 +155,8 @@ socket.on('userCount', function (user_count) {
 
 socket.on('newMessage', function (msg) {
     var now = new Date();
-    var timestamp = moment(now).format('h:mm a');
     console.log(msg);
-    var context = [{
-        'posted': timestamp,
-        'messageText': msg.messageText,
-        'username': msg.username,
-        'avatarUrl': msg.avatarUrl
-    }];
+    var context = [msg];
     var messageHtml = risechat.messageTemplate(context)
     var $msg = $('#messages');
     $msg.append(messageHtml);
@@ -171,10 +167,11 @@ socket.on('newMessage', function (msg) {
 
 socket.on('searchResults', function (results) {
     if (results.length > 0) {
+        console.log('got results on front-end',results);
         var searchHtml = risechat.searchTemplate(results);
         $('#searchResults').empty().html(searchHtml);
     } else {
-        $('#searchResults').empty().html('<div><div class="msg-details"><span>No Search Results</span></div></div>');
+        showNoResults(false);
     }
 });
 
@@ -208,15 +205,19 @@ socket.on('updateRoom', function (resp) {
     //$('#messages').html('<div class="flash"><em>You\'ve joined ' + resp.room + '</em></div>');
     $('.flash').show().delay(3000).fadeOut();
 
-    //Loop through and format the dates
-    $(resp.messages).each(function () {
-        this.Posted = moment(this.Posted).format('h:mm a');
-    });
-
-    var messageHtml = risechat.messageTemplate(resp.messages.reverse())
+    var messageHtml = risechat.messageTemplate(resp.messages)
 
     var $msg = $('#messages');
     $msg.append(messageHtml);
     var h = $msg[0].scrollHeight;
     $msg.scrollTop(h + 30);
 });
+
+
+function showNoResults(blank){
+    if(blank){
+        $('#searchResults').empty();
+    }else{
+        $('#searchResults').empty().html('<div><div class="msg-details"><span>No Search Results</span></div></div>');   
+    }
+}

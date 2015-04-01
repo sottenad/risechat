@@ -6,6 +6,7 @@ var http = require('http').Server(app);
 var req = require('request');
 var io = require('socket.io')(http);
 var path = require('path');
+var moment = require('moment');
 var mongoose = require('mongoose'); 
 var textSearch = require('mongoose-text-search');
 
@@ -20,16 +21,17 @@ db.once('open', function (callback) {
 
 var chatSchema = mongoose.Schema({
     posted: Date,
+    postedTime: String,
     messageText: String,
     channel: String,
     avatarUrl: String,
     username: String
 });
 chatSchema.plugin(textSearch);
-chatSchema.index({messageText:'text'});
+chatSchema.index({messageText:1});
 
 var ChatMessage = mongoose.model('ChatMessage', chatSchema);
-chatSchema.set('autoIndex', false);
+chatSchema.set('autoIndex', true);
 
 
 
@@ -69,7 +71,6 @@ io.sockets.on('connection', function (socket) {
 
         ChatMessage.find({channel: newroom}, function(err, msgs){
             //Now pass back the room with the prepopulated messages (or none in an error)
-            console.log(msgs);
             socket.emit('updateRoom', { 'room': newroom, 'messages': msgs });
         });
 
@@ -78,14 +79,25 @@ io.sockets.on('connection', function (socket) {
     });
 
     socket.on('search', function (term) {
+        console.log('search back-end, term:'+term);
         var resp = [];
         var encoded = encodeURI(term);
-        ChatMessage.textSearch(term, function(err, data){
-            if(data.results.length >0){
-                console.log(data.results);
-                socket.emit('searchResults', data.results)
+        
+        ChatMessage.find({'messageText': new RegExp(term, 'i')}, function(err, data){
+            if(!err){
+                socket.emit('searchResults', data);
             }
         })
+        
+        /*
+        ChatMessage.textSearch(term, function(err, data){
+            console.log(err);
+            if(!err){
+                console.log(data.results);
+                
+            }
+        })
+        */
         
         /*
         req.get({
@@ -110,8 +122,8 @@ io.sockets.on('connection', function (socket) {
     
 
     socket.on('newMessage', function (msg) {
-        pushNew(msg, socket.room);
-        io.sockets.in(socket.room).emit('newMessage', msg);
+        pushNew(msg, socket.room, io);
+        
     });
 
     socket.on('disconnect', function () {
@@ -128,6 +140,7 @@ io.sockets.on('connection', function (socket) {
 
 
 function getUsers(socket) {
+    /*
     req.get({
         'uri': 'http://bhpcourse.bluerooster.com/services/users.asmx/Getusers',
         'json': true,
@@ -141,12 +154,14 @@ function getUsers(socket) {
         }
         socket.emit('getUsers', resp);
     });
+    */
 }
 
-function pushNew(msg, thisroom) {
-    console.log(msg);
+function pushNew(msg, thisroom, io) {
+    var rightNow = new Date();
     var newMsg = new ChatMessage({
-        posted: new Date(),
+        posted: rightNow,
+        postedTime: moment(rightNow).format('h:mm a'),
         username: msg.username,
         messageText: msg.messageText,
         avatarUrl: msg.avatarUrl,
@@ -156,8 +171,9 @@ function pushNew(msg, thisroom) {
         if (err) {
           return console.error(err);
         }else{
-            console.log(newMessage);
+          console.log(newMessage);
           console.log('message saved');
+          io.sockets.in(thisroom).emit('newMessage', newMessage);
         }
     });
 }

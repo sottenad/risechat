@@ -148,7 +148,7 @@
             <div class="pull-left msg-details">
                 <span class="user-stamp">
                     <strong>{{username}}</strong>
-                    <small>{{posted}}</small>
+                    <small>{{postedTime}}</small>
                 </span>
                 {{{messageText}}}
             </div>
@@ -161,10 +161,10 @@
         <div>
             <div class="msg-details">
                 <span>
-                    <strong>{{obj.username}}: </strong>
+                    <strong>{{username}}: </strong>
                 </span>
-                <small class="pull-right">{{obj.posted}}</small>
-                {{{obj.messageText}}}
+                <small class="pull-right">{{postedTime}}</small>
+                {{{messageText}}}
             </div>
         </div>
         {{/each}}
@@ -183,7 +183,6 @@
 
     <!-- Scripts -->
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.0/handlebars.min.js"></script>
     <script src="/js/utils.js"></script>
     <script src="/js/main.js"></script>
