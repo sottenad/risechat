@@ -27,6 +27,7 @@ http.listen(port, function () {
 
 //Connect to DB and specify collection.
 mongoose.connect('localhost', 'risechat');
+
 // create our schema 
 var chatSchema = mongoose.Schema({
     messageText: String,
@@ -35,9 +36,8 @@ var chatSchema = mongoose.Schema({
     avatarUrl: String,
     channel: String
 });
-
 chatSchema.plugin(textSearch);
-chatSchema.index({ messageText: 'text' });
+chatSchema.index({messageText: 'text'});
 var ChatMessage = mongoose.model('ChatMessage', chatSchema);
 
 
@@ -47,18 +47,15 @@ var rooms = ['general', 'hackathon'];
 //Connection to the socket.
 io.sockets.on('connection', function (socket) {
 
-    socket.on('addChannel', function (roomName) {
+    socket.on('addChannel', function (roomName) { 
         rooms.push(roomName);
         socket.emit('updateChannelList', rooms);
     });
      
     socket.on('switchRoom', function (newroom) {
-        
         socket.leave(socket.room);
         socket.join(newroom);       
         socket.room = newroom;
-
-        console.log('switchRoom: ' + newroom)
         ChatMessage.find({channel:newroom}, function(err, data){
             if(err){
                 //console.log(err);
@@ -66,7 +63,6 @@ io.sockets.on('connection', function (socket) {
                 socket.emit('updateRoom', { 'room': newroom, 'messages': data });
             }
         });
-        
         //Every time someone joins, we want to re-fire this.
         getUsers(socket);
     });
@@ -74,6 +70,12 @@ io.sockets.on('connection', function (socket) {
     socket.on('search', function (term) {
         var resp = [];
         var encoded = encodeURI(term);
+        ChatMessage.textSearch(term, function (err, data) {
+            console.log(data);
+            console.log(err);
+            socket.emit('searchResults', data);
+        });
+        
         req.get({
             'uri': 'http://bhpcourse.bluerooster.com/services/messages.asmx/GetMessages?max=10&mt=' + encoded,
             'json': true,
@@ -86,7 +88,7 @@ io.sockets.on('connection', function (socket) {
                 console.log("Response error:" + e + body);
             }
             //Now pass back the room with the prepopulated messages (or none in an error)
-            socket.emit('searchResults', resp);
+            
         });
     });
 

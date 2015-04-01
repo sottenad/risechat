@@ -164,12 +164,12 @@ socket.on('newMessage', function (msg) {
 });
 
 socket.on('searchResults', function (results) {
-    if (results.length > 0) {
+    //if (results.length > 0) {
         var searchHtml = risechat.searchTemplate(results);
         $('#searchResults').empty().html(searchHtml);
-    } else {
-        $('#searchResults').empty().html('<div><div class="msg-details"><span>No Search Results</span></div></div>');
-    }
+    //} else {
+    //    $('#searchResults').empty().html('<div><div class="msg-details"><span>No Search Results</span></div></div>');
+    //}
 });
 
 socket.on('getUsers', function (resp) {
