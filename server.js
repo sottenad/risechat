@@ -6,6 +6,33 @@ var http = require('http').Server(app);
 var req = require('request');
 var io = require('socket.io')(http);
 var path = require('path');
+var mongoose = require('mongoose'); 
+var textSearch = require('mongoose-text-search');
+
+
+mongoose.connect('mongodb://localhost/risechat');
+
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function (callback) {
+  console.log('im connected to the db');
+});
+
+var chatSchema = mongoose.Schema({
+    posted: Date,
+    messageText: String,
+    channel: String,
+    avatarUrl: String,
+    username: String
+});
+chatSchema.plugin(textSearch);
+chatSchema.index({messageText:'text'});
+
+var ChatMessage = mongoose.model('ChatMessage', chatSchema);
+chatSchema.set('autoIndex', false);
+
+
+
 
 //Configure static asset routes
 app.use("/img", express.static(__dirname + "/img"));
@@ -23,7 +50,7 @@ http.listen(port, function () {
     console.log('listening on *:' + port );
 });
 
-/*
+
 var rooms = ['general', 'hackathon'];
 
 //Connection to the socket.
@@ -40,21 +67,10 @@ io.sockets.on('connection', function (socket) {
         socket.join(newroom);       
         socket.room = newroom;
 
-        var resp;
-        req.get({
-            'uri': 'http://bhpcourse.bluerooster.com/services/messages.asmx/GetMessages?max=30&cn='+newroom ,
-            'json':true,
-            'headers': {}
-        }, function (e, r, body) {
-            if (!e && r.statusCode == 200) {
-                //console.log(body);
-                resp = body;
-            } else {
-                console.log("Response error:" +  e + body);
-                resp = [];
-            }
+        ChatMessage.find({channel: newroom}, function(err, msgs){
             //Now pass back the room with the prepopulated messages (or none in an error)
-            socket.emit('updateRoom', { 'room': newroom, 'messages': resp });
+            console.log(msgs);
+            socket.emit('updateRoom', { 'room': newroom, 'messages': msgs });
         });
 
         //Every time someone joins, we want to re-fire this.
@@ -64,6 +80,14 @@ io.sockets.on('connection', function (socket) {
     socket.on('search', function (term) {
         var resp = [];
         var encoded = encodeURI(term);
+        ChatMessage.textSearch(term, function(err, data){
+            if(data.results.length >0){
+                console.log(data.results);
+                socket.emit('searchResults', data.results)
+            }
+        })
+        
+        /*
         req.get({
             'uri': 'http://bhpcourse.bluerooster.com/services/messages.asmx/GetMessages?max=10&mt=' + encoded,
             'json': true,
@@ -78,6 +102,7 @@ io.sockets.on('connection', function (socket) {
             //Now pass back the room with the prepopulated messages (or none in an error)
             socket.emit('searchResults', resp);
         });
+        */
     });
 
     io.emit('userCount', io.engine.clientsCount);
@@ -119,12 +144,20 @@ function getUsers(socket) {
 }
 
 function pushNew(msg, thisroom) {
-    req.post({
-        'uri': 'http://bhpcourse.bluerooster.com/services/messages.asmx/AddMessage?mt=' + msg.MessageText + '&mf=' + msg.MessageFrom + '&cn=' + thisroom + '&avatarurl=' + msg.AvatarUrl,
-        'dataType': 'json',
-        'headers': {}
-    }, function (e, r, body) {
-        console.log("Response error:" + e + body);
+    console.log(msg);
+    var newMsg = new ChatMessage({
+        posted: new Date(),
+        username: msg.username,
+        messageText: msg.messageText,
+        avatarUrl: msg.avatarUrl,
+        channel: thisroom
+    });
+    newMsg.save(function (err, newMessage) {
+        if (err) {
+          return console.error(err);
+        }else{
+            console.log(newMessage);
+          console.log('message saved');
+        }
     });
 }
-*/

@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html>
 <head>
     <title>RiseChat 1.0</title>
@@ -138,8 +138,8 @@
         {{#each . }}
         <div>
             <div class="pull-left avatar">
-                {{#if AvatarURL}}
-                    <img src="{{AvatarURL}}" />
+                {{#if avatarUrl}}
+                    <img src="{{avatarUrl}}" />
                 {{else}}
                     <img src="/img/default_face.jpg" />
                 {{/if}}
@@ -147,10 +147,10 @@
             
             <div class="pull-left msg-details">
                 <span class="user-stamp">
-                    <strong>{{MessageFrom}}</strong>
-                    <small>{{Posted}}</small>
+                    <strong>{{username}}</strong>
+                    <small>{{posted}}</small>
                 </span>
-                {{{MessageText}}}
+                {{{messageText}}}
             </div>
         </div>
         {{/each}}
@@ -161,10 +161,10 @@
         <div>
             <div class="msg-details">
                 <span>
-                    <strong>{{MessageFrom}}: </strong>
+                    <strong>{{obj.username}}: </strong>
                 </span>
-                <small class="pull-right">{{Posted}}</small>
-                {{{MessageText}}}
+                <small class="pull-right">{{obj.posted}}</small>
+                {{{obj.messageText}}}
             </div>
         </div>
         {{/each}}
@@ -174,9 +174,9 @@
         {{#each .}}
         <div class="directoryItem">
             <div class="pull-left avatar">
-                <img src="{{AvatarURL}}" />
+                <img src="{{avatarUrl}}" />
             </div>
-            <span>{{UserName}}</span>
+            <span>{{userName}}</span>
         </div>
         {{/each}}
     </script>
