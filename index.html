@@ -136,16 +136,20 @@
     <!-- Handlebars templates -->
     <script id="messageTemplate" type="text/x-handlebars-template">
         {{#each . }}
-        <div>
-            <div class="pull-left avatar">
+        <div class="clearfix messageRow">
+            <div class="pull-left pad avatar">
                 {{#if avatarUrl}}
-                    <img src="{{avatarUrl}}" />
+                    <div>
+                        <img src="{{avatarUrl}}" />
+                    </div>
                 {{else}}
-                    <img src="/img/default_face.jpg" />
+                    <div>
+                        <img src="/img/default_face.jpg" />
+                    </div>
                 {{/if}}
             </div>
             
-            <div class="pull-left msg-details">
+            <div class="pull-left pad msg-details">
                 <span class="user-stamp">
                     <strong>{{username}}</strong>
                     <small>{{postedTime}}</small>

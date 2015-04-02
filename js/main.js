@@ -109,7 +109,7 @@ $(function () {
 /* =============================================== */
 //Socket Config
 var socket = io();
-$('form').submit(function () {
+$('.message').submit(function () {
     var messageBox = $('#m');
     var messageTxt = messageBox.val();
 

@@ -1,4 +1,4 @@
-﻿body, html, .app{
+body, html, .app{
     width:100%;
     height:100%;
     font-family: 'Lato', sans-serif;
@@ -147,9 +147,11 @@
     color:#fff;
 }
 
-.avatar img{
+.avatar div{
+    overflow:hidden;
     border-radius:24px;
 }
+
 
 .userCount{
     color:#3cbdc4;
@@ -179,14 +181,18 @@
     bottom:55px;
     width:100%;
     overflow-y:scroll;
-
-}
-#messages div {
-    padding: 5px 10px;
-    min-height:48px;
-    overflow:hidden;
     font-size:16px;
     color:#666;
+
+}
+#messages .messageRow{
+    padding:4px 0 4px 15px;   
+}
+
+#messages .pad {
+    padding: 5px 10px 5px 0;
+    min-height:48px;
+    overflow:hidden;
 }
 
 #messages .user-stamp{
